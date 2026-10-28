@@ -1,0 +1,20 @@
+---
+all:
+  children:
+    routers:
+      hosts:
+        R3:
+          ansible_host: 172.16.27.20
+        R4:
+          ansible_host: 172.16.27.21
+    core_switches:
+      hosts:
+        MLS2:
+          ansible_host: 172.16.27.22
+    access_switches:
+      # SW4 foer SW3: viktig ved migrering av management-IP
+      hosts:
+        SW4:
+          ansible_host: 172.16.27.24
+        SW3:
+          ansible_host: 172.16.27.23

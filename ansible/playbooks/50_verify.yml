@@ -1,0 +1,41 @@
+---
+- name: Etterkontroll - laes Cisco status (ingen endringer)
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Hent interface status
+      cisco.ios.ios_command:
+        commands:
+          - show ip interface brief
+      register: check
+    - name: Skriv ut
+      ansible.builtin.debug:
+        var: check.stdout_lines
+
+- name: Kontroller VLAN og trunk (switcher)
+  hosts: access_switches
+  gather_facts: false
+  tasks:
+    - name: VLAN og trunk
+      cisco.ios.ios_command:
+        commands:
+          - show vlan brief
+          - show interfaces trunk
+      register: check
+    - name: Skriv ut
+      ansible.builtin.debug:
+        var: check.stdout_lines
+
+- name: Kontroller DHCP og ruter paa routere
+  hosts: routers
+  gather_facts: false
+  tasks:
+    - name: DHCP og ruting
+      cisco.ios.ios_command:
+        commands:
+          - show ip route
+          - show ip dhcp pool
+      register: check
+    - name: Skriv ut
+      ansible.builtin.debug:
+        var: check.stdout_lines

@@ -1,0 +1,37 @@
+---
+# KJOERES BARE ETTER AT ROUTERNE ER KONFIGURERT, SWITCHENE ER NAABARE
+# MED SINE GAMLE IP-ER, OG ALLE PORTER ER KONTROLLERT.
+# Rekkefolge via inventory: SW4 for SW3. SSH kan brytes ved IP-skiftet.
+- name: Flytt SW3 og SW4 til management-subnett 172.16.28.0/24
+  hosts: access_switches
+  order: inventory
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: Krev eksplisitt bekreftelse
+      ansible.builtin.assert:
+        that:
+          - bekreft_migrering | default('NEI') == 'JA'
+        fail_msg: "STOPP: Kontroller README.md og nettverket. Kjor med -e bekreft_migrering=JA etter kontroll."
+
+    - name: Sett framtidig default gateway (gammel SSH-IP beholdes)
+      cisco.ios.ios_config:
+        lines:
+          - "ip default-gateway {{ mgmt_gateway }}"
+
+    - name: Lagre gateway foer adresseendring
+      cisco.ios.ios_config:
+        save_when: always
+
+    - name: Bytt IP paa Vlan1 - SSH-kanalen kan bli brutt (forventet)
+      cisco.ios.ios_config:
+        parents: interface Vlan1
+        lines:
+          - "ip address {{ mgmt_new_ip }} 255.255.255.0"
+      register: migrate_result
+      ignore_errors: true
+      ignore_unreachable: true
+
+    - name: Vis ny management-IP
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} skal naa ha {{ mgmt_new_ip }}. Lagre igjen fra MLS2-siden med 60_save.yml."

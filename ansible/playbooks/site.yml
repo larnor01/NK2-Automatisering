@@ -1,0 +1,6 @@
+---
+# KJOER DENNE FORST NAAR ALLE FEM ENHETER ER NAABARE MED RIKTIG IP-PLAN.
+# Bruk heller 10_routers.yml og 20_switches_l2.yml hver for seg ved foerste oppsett.
+- import_playbook: 10_routers.yml
+- import_playbook: 20_switches_l2.yml
+# EtherChannel er BEVISST IKKE med: maa avtales med STUD1.

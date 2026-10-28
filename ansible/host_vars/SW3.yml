@@ -1,0 +1,10 @@
+---
+# Fa0/1 -> R3, Fa0/2 -> R4, Fa0/4 -> SW4 (bekreftet i forrige labøkt).
+# Bekreft med show cdp neighbors på nytt ved ny labøkt.
+router_ports:
+  - FastEthernet0/1
+  - FastEthernet0/2
+switch_uplink_port: FastEthernet0/4
+mgmt_old_ip: 172.16.27.23
+mgmt_new_ip: 172.16.28.23
+mgmt_gateway: 172.16.28.1

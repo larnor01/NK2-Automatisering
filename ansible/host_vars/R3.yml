@@ -1,0 +1,16 @@
+---
+# Bekreftet med CDP: G0/0/0 -> MLS2 Gi1/0/2, G0/0/1 -> SW3 Fa0/1
+wan_interface: GigabitEthernet0/0/0
+wan_ip: 172.16.27.20
+lan_interface: GigabitEthernet0/0/1
+lan_management_ip: 172.16.28.1
+user_vlan: 10
+user_ip: 192.168.10.1
+user_subnet: 192.168.10.0
+user_mask: 255.255.255.0
+dhcp_pool: STUD2_VLAN10
+dhcp_excluded_start: 192.168.10.1
+dhcp_excluded_end: 192.168.10.49
+remote_subnet: 192.168.20.0
+remote_mask: 255.255.255.0
+remote_next_hop: 172.16.27.21

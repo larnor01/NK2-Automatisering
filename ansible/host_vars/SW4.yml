@@ -1,0 +1,13 @@
+---
+# Portnummer fra topologitegning oversatt til faktisk SW4 GigabitEthernet1/0/x.
+# Bekreft mot ekte kabler foer du kjorer, spesielt Gi1/0/4 og Gi1/0/5.
+switch_uplink_port: GigabitEthernet1/0/1
+access_vlan20_port: GigabitEthernet1/0/2
+access_vlan10_port: GigabitEthernet1/0/3
+etherchannel_ports:
+  - GigabitEthernet1/0/4
+  - GigabitEthernet1/0/5
+etherchannel_group: 1
+mgmt_old_ip: 172.16.27.24
+mgmt_new_ip: 172.16.28.24
+mgmt_gateway: 172.16.28.1

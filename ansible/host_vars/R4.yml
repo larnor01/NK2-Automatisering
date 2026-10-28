@@ -1,0 +1,17 @@
+---
+# G0/0 -> MLS2 Gi1/0/3. G0/1 -> SW3 Fa0/2 (bekreftet i forrige labøkt).
+# Kontroller fysisk kabling på nytt før bruk.
+wan_interface: GigabitEthernet0/0
+wan_ip: 172.16.27.21
+lan_interface: GigabitEthernet0/1
+lan_management_ip: 172.16.28.2
+user_vlan: 20
+user_ip: 192.168.20.1
+user_subnet: 192.168.20.0
+user_mask: 255.255.255.0
+dhcp_pool: STUD2_VLAN20
+dhcp_excluded_start: 192.168.20.1
+dhcp_excluded_end: 192.168.20.49
+remote_subnet: 192.168.10.0
+remote_mask: 255.255.255.0
+remote_next_hop: 172.16.27.20

@@ -1,0 +1,47 @@
+---
+# Maa koordineres med STUD1. Begge sider maa bruke LACP active
+# paa tilhoerende porter, samme native VLAN og allowed VLAN-liste.
+- name: SW4 - EtherChannel (kun etter avtale med STUD1)
+  hosts: SW4
+  gather_facts: false
+  tasks:
+    - name: Krev eksplisitt bekreftelse
+      ansible.builtin.assert:
+        that:
+          - bekreft_etherchannel | default('NEI') == 'JA'
+        fail_msg: "STOPP: Avtal Gi1/0/4 og Gi1/0/5 med STUD1. Kjor -e bekreft_etherchannel=JA etterpaa."
+
+    - name: Opprett trunk Port-channel1
+      cisco.ios.ios_config:
+        parents: "interface Port-channel{{ etherchannel_group }}"
+        lines:
+          - switchport mode trunk
+          - switchport trunk native vlan 1
+          - switchport trunk allowed vlan 1,10,20
+          - no shutdown
+
+    - name: Konfigurer de to medlemsportene
+      cisco.ios.ios_config:
+        parents: "interface {{ item }}"
+        lines:
+          - switchport mode trunk
+          - switchport trunk native vlan 1
+          - switchport trunk allowed vlan 1,10,20
+          - "channel-group {{ etherchannel_group }} mode active"
+          - no shutdown
+      loop: "{{ etherchannel_ports }}"
+
+    - name: Lagre
+      cisco.ios.ios_config:
+        save_when: modified
+
+    - name: Verifiser EtherChannel
+      cisco.ios.ios_command:
+        commands:
+          - show etherchannel summary
+          - show interfaces trunk
+      register: channel_status
+
+    - name: Vis status
+      ansible.builtin.debug:
+        var: channel_status.stdout_lines

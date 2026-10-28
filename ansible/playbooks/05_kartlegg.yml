@@ -1,0 +1,14 @@
+---
+- name: Kartlegg CDP og interface foer konfigurasjon
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Hent CDP-naboer og interface
+      cisco.ios.ios_command:
+        commands:
+          - show cdp neighbors
+          - show ip interface brief
+      register: output
+    - name: Vis funn
+      ansible.builtin.debug:
+        var: output.stdout_lines

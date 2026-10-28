@@ -1,0 +1,60 @@
+---
+- name: Konfigurer SW3 og SW4 VLAN og trunk (men IKKE EtherChannel)
+  hosts: access_switches
+  gather_facts: false
+  tasks:
+    - name: Opprett VLAN 10
+      cisco.ios.ios_config:
+        parents: vlan 10
+        lines:
+          - name STUD2_VLAN10
+
+    - name: Opprett VLAN 20
+      cisco.ios.ios_config:
+        parents: vlan 20
+        lines:
+          - name STUD2_VLAN20
+
+    - name: SW3 - trunk mot R3 og R4
+      cisco.ios.ios_config:
+        parents: "interface {{ item }}"
+        lines:
+          - switchport mode trunk
+          - switchport trunk native vlan 1
+          - switchport trunk allowed vlan 1,10,20
+          - no shutdown
+      loop: "{{ router_ports }}"
+      when: inventory_hostname == 'SW3'
+
+    - name: Trunk mellom SW3 og SW4
+      cisco.ios.ios_config:
+        parents: "interface {{ switch_uplink_port }}"
+        lines:
+          - switchport mode trunk
+          - switchport trunk native vlan 1
+          - switchport trunk allowed vlan 1,10,20
+          - no shutdown
+
+    - name: SW4 - tilkobling til PC i VLAN 20
+      cisco.ios.ios_config:
+        parents: "interface {{ access_vlan20_port }}"
+        lines:
+          - switchport mode access
+          - switchport access vlan 20
+          - spanning-tree portfast
+          - no shutdown
+      when: inventory_hostname == 'SW4'
+
+    - name: SW4 - tilkobling til PC i VLAN 10
+      cisco.ios.ios_config:
+        parents: "interface {{ access_vlan10_port }}"
+        lines:
+          - switchport mode access
+          - switchport access vlan 10
+          - spanning-tree portfast
+          - no shutdown
+      when: inventory_hostname == 'SW4'
+
+    - name: Lagre switch-konfigurasjon
+      cisco.ios.ios_config:
+        save_when: modified

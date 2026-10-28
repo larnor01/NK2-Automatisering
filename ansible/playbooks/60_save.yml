@@ -1,0 +1,8 @@
+---
+- name: Lagre running-config til startup-config paa valgte enheter
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Lagre
+      cisco.ios.ios_config:
+        save_when: always

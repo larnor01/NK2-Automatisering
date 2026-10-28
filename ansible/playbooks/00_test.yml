@@ -1,0 +1,13 @@
+---
+- name: Lesetest mot Cisco-utstyr (ingen endringer)
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Vis IP-interface
+      cisco.ios.ios_command:
+        commands:
+          - show ip interface brief
+      register: output
+    - name: Vis resultat
+      ansible.builtin.debug:
+        var: output.stdout_lines

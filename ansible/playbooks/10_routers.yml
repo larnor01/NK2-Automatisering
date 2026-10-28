@@ -1,0 +1,53 @@
+---
+- name: Konfigurer router-on-a-stick og DHCP paa R3 og R4
+  hosts: routers
+  gather_facts: false
+  tasks:
+    - name: Behold bekreftet management-IP mot MLS2
+      cisco.ios.ios_config:
+        parents: "interface {{ wan_interface }}"
+        lines:
+          - "ip address {{ wan_ip }} 255.255.255.0"
+          - no shutdown
+
+    - name: Aktiver trunkens fysiske router-port mot SW3
+      cisco.ios.ios_config:
+        parents: "interface {{ lan_interface }}"
+        lines:
+          - no ip address
+          - no shutdown
+
+    - name: Router subinterface - management VLAN 1 (untagged/native)
+      cisco.ios.ios_config:
+        parents: "interface {{ lan_interface }}.1"
+        lines:
+          - encapsulation dot1Q 1 native
+          - "ip address {{ lan_management_ip }} 255.255.255.0"
+
+    - name: Router subinterface - VLAN for DHCP og brukere
+      cisco.ios.ios_config:
+        parents: "interface {{ lan_interface }}.{{ user_vlan }}"
+        lines:
+          - "encapsulation dot1Q {{ user_vlan }}"
+          - "ip address {{ user_ip }} {{ user_mask }}"
+
+    - name: Reserver gateway og de foerste adressene fra DHCP
+      cisco.ios.ios_config:
+        lines:
+          - "ip dhcp excluded-address {{ dhcp_excluded_start }} {{ dhcp_excluded_end }}"
+
+    - name: Opprett DHCP-pool
+      cisco.ios.ios_config:
+        parents: "ip dhcp pool {{ dhcp_pool }}"
+        lines:
+          - "network {{ user_subnet }} {{ user_mask }}"
+          - "default-router {{ user_ip }}"
+
+    - name: Statisk rute til VLAN paa den andre routeren
+      cisco.ios.ios_config:
+        lines:
+          - "ip route {{ remote_subnet }} {{ remote_mask }} {{ remote_next_hop }}"
+
+    - name: Lagre router-konfigurasjon
+      cisco.ios.ios_config:
+        save_when: modified
